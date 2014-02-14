@@ -5,6 +5,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/gpu/gpu.hpp>
 #include <stdexcept>
 
 namespace image_geometry {
@@ -111,6 +112,11 @@ public:
    * \brief Rectify a raw camera image.
    */
   void rectifyImage(const cv::Mat& raw, cv::Mat& rectified,
+                    int interpolation = CV_INTER_LINEAR) const;
+  /**
+   * \brief Rectify a raw camera image with the GPU.
+   */
+  void rectifyImageGpu(const cv::gpu::GpuMat& raw, cv::gpu::GpuMat& rectified, 
                     int interpolation = CV_INTER_LINEAR) const;
 
   /**

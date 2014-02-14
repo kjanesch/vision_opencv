@@ -282,6 +282,24 @@ void PinholeCameraModel::rectifyImage(const cv::Mat& raw, cv::Mat& rectified, in
   }
 }
 
+void PinholeCameraModel::rectifyImageGpu(const cv::gpu::GpuMat& raw, cv::gpu::GpuMat& rectified, int interpolation) const
+{
+  assert( initialized() );
+
+  switch (cache_->distortion_state) {
+    case NONE:
+      raw.copyTo(rectified);
+      break;
+    case CALIBRATED:
+      initRectificationMaps();
+      cv::gpu::remap(raw, rectified, cv::gpu::GpuMat(cache_->reduced_map1), cv::gpu::GpuMat(cache_->reduced_map2), interpolation);
+      break;
+    default:
+      assert(cache_->distortion_state == UNKNOWN);
+      throw Exception("Cannot call rectifyImageGpu when distortion is unknown.");
+  }
+}
+
 void PinholeCameraModel::unrectifyImage(const cv::Mat& rectified, cv::Mat& raw, int interpolation) const
 {
   assert( initialized() );
